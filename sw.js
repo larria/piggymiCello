@@ -1,6 +1,6 @@
 /* 咪猪头拉大提琴 Service Worker — 应用外壳缓存 + 安全 PWA 更新
    RELEASE 每次发版手动递增,驱动缓存换代与新版本检测 */
-const RELEASE = 'v3';
+const RELEASE = 'v4';
 const PREFIX = 'piggy-cello-';
 const CACHE = PREFIX + RELEASE;
 
