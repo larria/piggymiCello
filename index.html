@@ -382,6 +382,59 @@
       margin: 8px 0;
     }
 
+    /* 全局麦克风占用提示 + 停止按钮(任何页面可见) */
+    #micPill {
+      position: fixed;
+      left: 50%;
+      bottom: calc(var(--safe-b) + 84px);
+      transform: translateX(-50%);
+      z-index: 40;
+      display: none;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: 1px solid #f0c4b5;
+      background: #fffaf5;
+      color: #b25a44;
+      font-size: 13px;
+      font-weight: 650;
+      box-shadow: 0 6px 24px #b25a4418;
+      max-width: calc(100vw - 32px);
+      min-height: var(--touch-target);
+    }
+
+    #micPill.show {
+      display: flex;
+      animation: page-in .2s ease;
+    }
+
+    #micPill .rec-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--coral);
+      animation: rec-blink 1.6s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes rec-blink {
+      50% { opacity: .25; }
+    }
+
+    #micPill .stop-x {
+      font-size: 14px;
+      padding: 3px 12px;
+      border-radius: 14px;
+      background: var(--coral);
+      color: #fffdf2;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 821px) {
+      #micPill { bottom: calc(var(--safe-b) + 24px); }
+    }
+
     /* ============ 首页 ============ */
     .hero {
       border-radius: 25px;
@@ -1684,6 +1737,9 @@
     </main>
   </div>
 
+  <!-- ============ 全局麦克风占用提示(任何页面可见) ============ -->
+  <button id="micPill" aria-label="停止调音,释放麦克风"><span class="rec-dot"></span>调音中·麦克风使用中<span class="stop-x">停止</span></button>
+
   <!-- ============ 设置抽屉 ============ -->
   <div id="settings">
     <div class="sheet">
@@ -2040,6 +2096,7 @@
       el.btnStart.classList.add('stop');
       el.micState.innerHTML = '<span class="led"></span>监听中';
       el.micState.classList.add('on');
+      micPill.classList.add('show');
       el.hint.textContent = '请拨响琴弦…';
       requestWakeLock();
       loop();
@@ -2054,6 +2111,7 @@
       el.btnStart.classList.remove('stop');
       el.micState.innerHTML = '<span class="led"></span>待机';
       el.micState.classList.remove('on');
+      micPill.classList.remove('show');
       el.statusCard.classList.remove('intune');
       el.levelBar.style.width = '0%';
       el.noteLetter.textContent = '—'; el.noteOct.textContent = '';
@@ -2070,6 +2128,9 @@
       ensureToneCtx();
       running ? stopMic() : startMic();
     });
+    // 全局停止胶囊:任何页面都可一键释放麦克风
+    const micPill = document.getElementById('micPill');
+    micPill.addEventListener('click', () => { if (running) stopMic(); });
 
     async function requestWakeLock() {
       try {
@@ -2455,7 +2516,11 @@
 
     // 离开节拍器页/切后台时自动停止
     const _go = go;
-    go = function (page) { if (M.running) stopMetro(false); _go(page); };
+    go = function (page) {
+      if (M.running) stopMetro(false);
+      if (running) stopMic();   // 离开调音器页自动释放麦克风
+      _go(page);
+    };
 
     // 初始化 UI
     setBpm(M.bpm);
