@@ -1,0 +1,13 @@
+{
+  "name": "piggy-cello",
+  "version": "1.0.0",
+  "private": true,
+  "description": "咪猪头拉大提琴:大提琴调音器与节拍器 PWA",
+  "scripts": {
+    "copy": "rm -rf dist && mkdir -p dist && cp index.html manifest.json sw.js dist/ && cp -R icons dist/",
+    "deploy": "npm run copy && gh-pages -d dist --repo https://github.com/larria/piggymiCello.git"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
